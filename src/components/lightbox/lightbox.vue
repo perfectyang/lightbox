@@ -113,7 +113,7 @@ export default {
     this.imgs.length && this.imgs.forEach((item) => {
       store.addImage(item.imageUrl, this.imgName)
     })
-    this.totalPage = Math.floor(this.imgs.length / 8)
+    this.totalPage = Math.ceil(this.imgs.length / 8)
   },
   mounted () {
   },
@@ -127,11 +127,12 @@ export default {
       store.open(val, this.imgName)
       let temCurrentPage = Math.ceil(Number(val) / 8)
       console.log('temCurrentPage', temCurrentPage)
+      console.log('this.totalPage', this.totalPage)
       if (temCurrentPage > this.totalPage || temCurrentPage === 0) {
         temCurrentPage = 1
       }
-      this.scrolLeft = (temCurrentPage) * 8 * -82
-      console.log('this.scrolLeft', this.scrolLeft)
+      this.currentPage = temCurrentPage
+      this.moveScroll()
     }
   },
   methods: {
@@ -139,30 +140,38 @@ export default {
       // const arr = _.chunk(this.imgs, 8)
     },
     beforePage () {
+      console.log('this.currentPage', this.currentPage)
       if (Number(this.currentPage) === 1) {
         this.currentPage = this.totalPage
       } else {
         this.currentPage--
       }
-      this.scrolLeft = ((this.currentPage - 1) * 8) * 82
+      this.state.index = ((this.currentPage - 1) * 8)
+      this.moveScroll()
     },
     afterPage () {
-      console.log(this.currentPage)
+      console.log('this.currentPage', this.currentPage)
       console.log('this.totalPage', this.totalPage)
-      if (Number(this.currentPage) > this.totalPage) {
+      if (Number(this.currentPage) >= this.totalPage) {
         this.currentPage = 1
       } else {
         this.currentPage++
       }
-      this.scrolLeft = ((this.currentPage - 1) * 8) * (-82)
-      console.log('afterPage', this.currentPage)
+      this.state.index = ((this.currentPage - 1) * 8)
+      this.moveScroll()
     },
     close () {
       store.close()
       this.$emit('outClose')
     },
-    next () { store.next() },
-    prev () { store.prev() },
+    next () {
+      store.next()
+      this.setThundmail()
+    },
+    prev () {
+      store.prev()
+      this.setThundmail()
+    },
     showCurrent (index) { store.showCurrent(index) },
     enlarge () {
       store.enlarge()
@@ -175,6 +184,16 @@ export default {
     rotate () {
       store.rotate()
       window.onresize()
+    },
+    setThundmail () {
+      this.currentPage = Math.ceil(this.state.index / 8)
+      if (Number(this.currentPage) === 0) {
+        this.currentPage = 1
+      }
+      this.moveScroll()
+    },
+    moveScroll () {
+      this.scrolLeft = ((this.currentPage - 1) * 8) * (-82)
     }
   },
   updated () {},
