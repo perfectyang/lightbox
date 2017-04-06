@@ -16,14 +16,7 @@
                 @click="showCurrent(index)"
                 ref="li">
                 <div class="view-img">
-                    <iframe
-                      :src="img.imageUrl"
-                      frameborder='0'
-                      scrolling="no"
-                      align="middle"
-                      width="100%"
-                      height="199"
-                      ></iframe>
+                    <img :src="img.imageUrl" style="max-height: 100%; max-width: 100%;">
                 </div>
               </li>
             </ul>
@@ -89,7 +82,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow: hidden;
   }
   .view-operate {
     position: absolute;
@@ -131,7 +123,7 @@ export default {
   },
   created () {
     this.imgs.length && this.imgs.forEach((item) => {
-      store.addImage(item, this.imgName)
+      store.addImage(item.imageUrl, this.imgName)
     })
     this.totalPage = Math.ceil(this.imgs.length / 8)
   },
@@ -188,10 +180,7 @@ export default {
       store.prev()
       this.setThundmail()
     },
-    showCurrent (index) {
-      console.log('index', index)
-      store.showCurrent(index)
-    },
+    showCurrent (index) { store.showCurrent(index) },
     enlarge () {
       store.enlarge()
       window.onresize()

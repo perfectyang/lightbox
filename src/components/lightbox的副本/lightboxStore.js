@@ -20,6 +20,11 @@ class Lightboxstore {
   open (index, group) {
     this.state.group = group
     this.state.index = index
+    // this.state.images[group].map((image, key) => {
+    //   if (image === url) {
+    //     this.state.index = key
+    //   }
+    // })
   }
   close () {
     this.state.index = false

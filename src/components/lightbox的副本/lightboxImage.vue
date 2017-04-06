@@ -1,27 +1,15 @@
 <template>
   <div @click.stop class="show-area" ref="area">
     <div class="area-position J_box" ref="box" @mouseup="onmouseUp" @mousemove="onmouseMove">
-      <!-- <div v-if="loading" class="lightbox__loading"></div> -->
-     <!--  <img
+      <div v-if="loading" class="lightbox__loading"></div>
+      <img
         @mousedown.stop="onmouseDown"
         ref="hookImg"
         :src="src"
         class="lightbox__image J_lightbox"
         :style="style"
         :key="src"
-        > -->
-        <div :style="[{'position': 'absolute', 'z-index': 10}, style]" ></div>
-        <div :style="style" ref="J_iframe">
-          <iframe
-           frameborder='0'
-           scrolling="no"
-           align="middle"
-           :src="image.imageUrl"
-           :key="image.imageUrl"
-           :width="image.width"
-           :height="image.height"
-          ></iframe>
-        </div>
+        >
     </div>
     
   </div>
@@ -50,7 +38,7 @@
   import store from './lightboxStore'
   export default {
     props: {
-      image: Object
+      image: String
     },
     data () {
       return {
@@ -58,7 +46,6 @@
         loading: true,
         src: false,
         style: {},
-        scale: 0,
         params: {
           left: 0,
           top: 0,
@@ -69,33 +56,6 @@
       }
     },
     methods: {
-      initView () {
-        // let target = window.getComputedStyle(this.$refs.area)
-        // let areaWidth = parseInt(target.width)
-        // let areaHeight = parseInt(target.height)
-        let width = this.image.width
-        let height = this.image.height
-        let target = getComputedStyle(this.$refs.area)
-        // console.log('getComputedStyle', target)
-        let areaWidth = parseInt(target.width)
-        let areaHeight = parseInt(target.height)
-        console.log('areaWidth', areaWidth)
-        console.log('areaHeight', areaHeight)
-        let scaleX = areaWidth / width
-        let scaleY = areaHeight / height
-        console.log('scaleX', scaleX)
-        if (scaleX > scaleY) {
-          this.style = {
-            transform: `scale(${scaleY}`
-          }
-          this.scale = scaleY
-        } else {
-          this.style = {
-            transform: `scale(${scaleX}`
-          }
-          this.scale = scaleX
-        }
-      },
       resizeImage (image) {
         let width = image.width
         let height = image.height
@@ -158,20 +118,11 @@
         this.$refs.area.onmousewheel = this.$refs.area.onmousewheel = (e) => {
           var res = eventCompat(e)
           if (res.delta < 0) {
-            if (this.scale >= 4) {
-              this.scale = 4
-            } else {
-              this.scale += 0.1
-            }
+            store.narrow()
+            window.onresize()
           } else {
-            if (this.scale <= 0.1) {
-              this.scale = 0.1
-            } else {
-              this.scale -= 0.1
-            }
-          }
-          this.style = {
-            transform: `scale(${this.scale}`
+            store.enlarge()
+            window.onresize()
           }
         }
       },
@@ -218,11 +169,9 @@
       }
     },
     mounted () {
-      // this.initImage()
-      this.initView()
+      this.initImage()
       this.mouseZoom()
-      // window.addEventListener('resize', this.initView)
-      window.onresize = this.initView
+      console.log('img', this.$refs.hookImg.getBoundingClientRect())
     },
     destroyed () {
       window.removeEventListener('resize', this.resizeEvent)
