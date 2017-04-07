@@ -15,14 +15,14 @@
                 :key="index"
                 @click="showCurrent(index)"
                 ref="li">
-                <div class="view-img">
+                <div class="view-img" :style="{'width': `calc(${img.width * 0.25})`, 'height': `calc(${img.height * 0.25})`}">
                     <iframe
                       :src="img.imageUrl"
                       frameborder='0'
                       scrolling="no"
                       align="middle"
-                      width="100%"
-                      height="199"
+                      :width="img.width"
+                      :height="img.height"
                       ></iframe>
                 </div>
               </li>
@@ -40,7 +40,7 @@
     <div class="lightbox__btn next" @click.stop.prevent="next">下一张</div>
   </div>
 </template>
-<style scoped>
+<style lang="less" scoped>
   ul, li {
     margin: 0;
     padding: 0;
@@ -50,12 +50,14 @@
     bottom: 20px;
     left:50%;
     width: 728px;
-    margin-left:-400px;
+    margin-left:-364px;
     z-index: 4000;
   }
   .item {
     border: 1px solid #ccc;
     margin-right: 10px;
+    width: 80px;
+    height: 80px;
     cursor: pointer;
     float: left;
     display: flex; 
@@ -84,13 +86,19 @@
     height: 110px;
   }
   .view-img {
-    width: 80px;
-    height: 80px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    position: relative;
     overflow: hidden;
   }
+  .view-img:after {
+      content: "";
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 10;
+    }
   .view-operate {
     position: absolute;
     width: 50px;
@@ -146,7 +154,7 @@ export default {
     },
     indexKey (val) {
       store.open(val, this.imgName)
-      let temCurrentPage = Math.ceil(Number(val) / 8)
+      let temCurrentPage = Math.ceil((Number(val) + 1) / 8)
       if (temCurrentPage > this.totalPage || temCurrentPage === 0) {
         temCurrentPage = 1
       }

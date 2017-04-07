@@ -1,7 +1,7 @@
 <template>
   <div @click.stop class="show-area" ref="area">
-    <div class="area-position J_box" ref="box" @mouseup="onmouseUp" @mousemove="onmouseMove">
-      <!-- <div v-if="loading" class="lightbox__loading"></div> -->
+    <div class="area-position J_box" ref="box">
+      <div v-if="loading" class="lightbox__loading"></div>
      <!--  <img
         @mousedown.stop="onmouseDown"
         ref="hookImg"
@@ -10,8 +10,11 @@
         :style="style"
         :key="src"
         > -->
-        <div :style="[{'position': 'absolute', 'z-index': 10}, style]" ></div>
-        <div :style="style" ref="J_iframe">
+        <div
+          :style="style"
+          ref="J_iframe"
+          class="mask"
+          >
           <iframe
            frameborder='0'
            scrolling="no"
@@ -31,10 +34,10 @@
     position: absolute;
     left: 50%;
     width: 80%;
-    height: 80%;
+    height: 78%;
     overflow: hidden;
     margin-left: -40%;
-    top: 40px;
+    bottom: 135px;
     border: 1px solid #ccc;
   }
   .area-position {
@@ -45,9 +48,22 @@
     justify-content: center;
     align-items: center;
   }
+  .mask {
+    position: absolute;
+  }
+  .mask:after {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
 </style>
 <script>
   import store from './lightboxStore'
+  import drag from './drag'
   export default {
     props: {
       image: Object
@@ -70,20 +86,13 @@
     },
     methods: {
       initView () {
-        // let target = window.getComputedStyle(this.$refs.area)
-        // let areaWidth = parseInt(target.width)
-        // let areaHeight = parseInt(target.height)
         let width = this.image.width
         let height = this.image.height
         let target = getComputedStyle(this.$refs.area)
-        // console.log('getComputedStyle', target)
         let areaWidth = parseInt(target.width)
         let areaHeight = parseInt(target.height)
-        console.log('areaWidth', areaWidth)
-        console.log('areaHeight', areaHeight)
         let scaleX = areaWidth / width
         let scaleY = areaHeight / height
-        console.log('scaleX', scaleX)
         if (scaleX > scaleY) {
           this.style = {
             transform: `scale(${scaleY}`
@@ -95,137 +104,48 @@
           }
           this.scale = scaleX
         }
-      },
-      resizeImage (image) {
-        let width = image.width
-        let height = image.height
-        // let originWidth = image.width
-        let target = window.getComputedStyle(this.$refs.area)
-        let areaWidth = parseInt(target.width)
-        let areaHeight = parseInt(target.height)
-        // let wW = window.innerWidth
-        // let wH = window.innerHeight - 200
-        let wW = areaWidth
-        let wH = areaHeight
-        if (width > wW || height > wH) {
-          const ratio = width / height
-          const windowRatio = wW / wH
-          if (ratio > windowRatio) {
-            width = wW
-            height = width / ratio
-          } else {
-            height = wH
-            width = height * ratio
-          }
+        this.params = {
+          left: 0,
+          top: 0,
+          currentX: 0,
+          currentY: 0,
+          flag: false
         }
-        width *= this.state.proportionValue
-        height *= this.state.proportionValue
-        this.style = {
-          width: width + 'px',
-          height: height + 'px',
-          position: 'absolute',
-          left: (areaWidth - width) * 0.5 + 'px',
-          top: (areaHeight - height) * 0.5 + 'px'
-        }
-        const rotateStyle = {
-          '-ms-transform': `rotate(${this.state.rotateValue}deg)`, /* IE 9 */
-          '-moz-transform': `rotate(${this.state.rotateValue}deg)`, /* Firefox */
-          '-webkit-transform': `rotate(${this.state.rotateValue}deg)`, /* Safari and Chrome */
-          '-o-transform': `rotate(${this.state.rotateValue}deg)`, /* Opera */
-          'transform': `rotate(${this.state.rotateValue}deg)`
-        }
-        this.style = Object.assign({}, this.style, rotateStyle)
+        drag.move(this.$refs.J_iframe, this.$refs.J_iframe, (x, y) => {}, this.params)
+        this.loading = false
       },
       // 图片放大缩小
       mouseZoom () {
-        const eventCompat = (event) => {
-          const type = event.type
-          if (type === 'DOMMouseScroll' || type === 'mousewheel') {
-            console.log('event.wheelDelta', event.wheelDelta)
-            console.log('event.detail', event.detail)
-            event.delta = (event.wheelDelta) ? event.wheelDelta / 120 : -(event.detail || 0) / 3
-          }
-          if (event.srcElement && !event.target) {
-            event.target = event.srcElement
-          }
-          if (!event.preventDefault && event.returnValue !== undefined) {
-            event.preventDefault = function () {
-              event.returnValue = false
-            }
-          }
-          return event
-        }
-        this.$refs.area.onmousewheel = this.$refs.area.onmousewheel = (e) => {
-          var res = eventCompat(e)
-          if (res.delta < 0) {
+        const fn = (e) => {
+          var res = drag.eventCompat(e)
+          if (res.direction < 0) {
+            this.scale += 0.1
             if (this.scale >= 4) {
               this.scale = 4
-            } else {
-              this.scale += 0.1
             }
           } else {
+            this.scale -= 0.1
             if (this.scale <= 0.1) {
               this.scale = 0.1
-            } else {
-              this.scale -= 0.1
             }
           }
           this.style = {
             transform: `scale(${this.scale}`
           }
         }
-      },
-      drag (e) {
-        const el = this.$el.getElementsByClassName('J_box')
-        this.style.left = el.pageX
-        this.style.top = el.pageY
-      },
-      onmouseUp (e) {
-        this.params.flag = false
-        // const el = this.$refs.box.getBoundingClientRect()
-      },
-      onmouseMove (e) {
-        if (this.params.flag) {
-          const nowX = e.clientX
-          const nowY = e.clientY
-          const disX = nowX - this.params.currentX
-          const disY = nowY - this.params.currentY
-          this.style.left = parseInt(this.params.left) + disX + 'px'
-          this.style.top = parseInt(this.params.top) + disY + 'px'
+        if (document.addEventListener) {
+          this.$refs.J_iframe.addEventListener('DOMMouseScroll', fn, false)
         }
-      },
-      onmouseDown (e) {
-        this.params.flag = true
-        this.params.currentX = e.clientX
-        this.params.currentY = e.clientY
-      },
-      imgMove (e) {
-        console.log('e', e)
-      },
-      initImage () {
-        const image = new window.Image()
-        image.onload = () => {
-          this.loading = false
-          this.src = this.image
-          this.resizeImage(image)
-        }
-        this.resizeEvent = () => {
-          this.resizeImage(image)
-        }
-        image.src = this.image
-        window.addEventListener('resize', this.resizeEvent)
-        window.onresize = this.resizeEvent
+        this.$refs.J_iframe.onmousewheel = this.$refs.box.onmousewheel = this.$refs.area.onmousewheel = fn
       }
     },
     mounted () {
-      // this.initImage()
       this.initView()
       this.mouseZoom()
-      // window.addEventListener('resize', this.initView)
       window.onresize = this.initView
     },
     destroyed () {
-      window.removeEventListener('resize', this.resizeEvent)
+      window.removeEventListener('resize', this.initView)
     }
   }
 

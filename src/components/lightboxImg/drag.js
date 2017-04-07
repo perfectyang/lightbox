@@ -3,12 +3,7 @@ module.exports = {
     return o.currentStyle ? o.currentStyle[key] : document.defaultView.getComputedStyle(o, false)[key]
   },
   move (bar, target, callback, params) {
-    if (this.getCss(target, 'left') !== 'auto') {
-      params.left = this.getCss(target, 'left')
-    }
-    if (this.getCss(target, 'top') !== 'auto') {
-      params.top = this.getCss(target, 'top')
-    }
+    console.log('params', params)
     bar.onmousedown = (event) => {
       params.flag = true
       if (!event) {
@@ -24,7 +19,7 @@ module.exports = {
       e.preventDefault()
       e.stopPropagation()
     }
-    document.onmouseup = (e) => {
+    document.onmouseup = () => {
       params.flag = false
       if (this.getCss(target, 'left') !== 'auto') {
         params.left = this.getCss(target, 'left')
@@ -33,9 +28,6 @@ module.exports = {
         params.top = this.getCss(target, 'top')
       }
       target.style.cursor = 'default'
-      const ev = event
-      ev.preventDefault()
-      ev.stopPropagation()
     }
     document.onmousemove = (event) => {
       var e = event || window.event
@@ -44,6 +36,7 @@ module.exports = {
         var nowY = e.clientY
         var disX = nowX - params.currentX
         var disY = nowY - params.currentY
+        target.style.position = 'absolute'
         target.style.left = parseInt(params.left) + disX + 'px'
         target.style.top = parseInt(params.top) + disY + 'px'
         target.style.cursor = 'pointer'

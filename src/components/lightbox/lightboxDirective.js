@@ -15,13 +15,13 @@ Vue.directive('lightbox', {
   update (el, binding) {
     const group = binding.expression
     store.remove('', group)
-    binding.value.forEach((item) => {
-      if (Object.prototype.toString.call(item) === '[object Object]') {
-        store.addImage(item.url, group)
-      } else {
-        store.addImage('http://www.soouya.com' + item, group)
-      }
-    })
+    // binding.value.forEach((item) => {
+    //   if (Object.prototype.toString.call(item) === '[object Object]') {
+    //     store.addImage(item.url, group)
+    //   } else {
+    //     store.addImage('http://www.soouya.com' + item, group)
+    //   }
+    // })
   },
   unbind (el, binding) {
     console.log('解绑')

@@ -43,7 +43,7 @@
     bottom: 20px;
     left:50%;
     width: 728px;
-    margin-left:-400px;
+    margin-left:-364px;
     z-index: 4000;
   }
   .item {
@@ -138,7 +138,7 @@ export default {
     },
     indexKey (val) {
       store.open(val, this.imgName)
-      let temCurrentPage = Math.ceil(Number(val) / 8)
+      let temCurrentPage = Math.ceil((Number(val) + 1) / 8)
       if (temCurrentPage > this.totalPage || temCurrentPage === 0) {
         temCurrentPage = 1
       }
