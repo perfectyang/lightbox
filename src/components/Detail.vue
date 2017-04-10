@@ -113,7 +113,6 @@ export default {
   name: 'hello',
   methods: {
     show (index) {
-      alert(index)
       this.index = index
     },
     close () {
@@ -174,12 +173,6 @@ export default {
         },
         {
           imageUrl: 'http://dev.www.kuaizitech.com/cgi/pcm/creative_download/preview?tid=1961825&cid=0&content_element=1001602,489362,0,0,0,0,0,0,0,0,0&load_video=1',
-          caption: 'Photo by 1',
-          width: 1920,
-          height: 1055
-        },
-        {
-          imageUrl: 'http://dev.www.kuaizitech.com/cgi/pcm/creative_download/preview?cid=1886903&tid=1961789&content_element=976129,489362,0,0,0,0,0,0,0,0,0',
           caption: 'Photo by 1',
           width: 1920,
           height: 1055

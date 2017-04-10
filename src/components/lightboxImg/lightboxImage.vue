@@ -26,7 +26,6 @@
     border: 1px solid #ccc;
   }
   .area-position {
-    position: relative;
     width: 100%;
     height: 100%;
   }
@@ -80,6 +79,12 @@
             width = height * ratio
           }
         }
+        if (this.state.proportionValue >= 4) { // 最大放大倍数为原来的 4
+          this.state.proportionValue = 4
+        }
+        if (this.state.proportionValue <= 0.1) { // 最小缩小倍数为原来的 0.1
+          this.state.proportionValue = 0.1
+        }
         width *= this.state.proportionValue
         height *= this.state.proportionValue
         this.style = {
@@ -104,11 +109,15 @@
         const fn = (e) => {
           var res = drag.eventCompat(e)
           if (res.direction < 0) {
-            store.narrow()
-            window.onresize()
+            if (this.state.proportionValue > 0.1) {
+              store.narrow()
+              window.onresize()
+            }
           } else {
-            store.enlarge()
-            window.onresize()
+            if (this.state.proportionValue <= 4) {
+              store.enlarge()
+              window.onresize()
+            }
           }
         }
         if (document.addEventListener) {

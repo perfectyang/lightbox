@@ -15,15 +15,39 @@
                 :key="index"
                 @click="showCurrent(index)"
                 ref="li">
-                <div class="view-img" :style="{'width': `calc(${img.width * 0.25})`, 'height': `calc(${img.height * 0.25})`}">
-                    <iframe
-                      :src="img.imageUrl"
-                      frameborder='0'
-                      scrolling="no"
-                      align="middle"
-                      :width="img.width"
-                      :height="img.height"
-                      ></iframe>
+                <div class="thumbnail-container"
+                  :style="{
+                    'width': '82px',
+                    'height': '82px',
+                    'position': 'relative'
+                  }"
+                >
+                  <div class="view-img"
+                   :style="{
+                      'width': `${img.width}px`,
+                      'height': `${img.height}px`,
+                      '-ms-zoom': `${80/img.width}`,
+                      '-moz-transform': `scale(${80/img.width}) translate(-50%, -50%)`,
+                      '-moz-transform-origin': '0 0',
+                      '-o-transform': `scale(${80/img.width}) translate(-50%, -50%)`,
+                      '-o-transform-origin': '0 0',
+                      'transform': `scale(${80/img.width}) translate(-50%, -50%)`,
+                      'transform-origin': '0 0',
+                      'position': 'absolute',
+                      'top': '50%',
+                      'left': '50%'
+                    }
+                    ">
+                      <iframe
+                        class="lazyframe"
+                        :src="img.imageUrl"
+                        frameborder='0'
+                        scrolling="no"
+                        align="middle"
+                        :width="img.width"
+                        :height="img.height"
+                        ></iframe>
+                  </div>
                 </div>
               </li>
             </ul>
@@ -118,6 +142,7 @@
 import './lightboxDirective'
 import store from './lightboxStore'
 import lightboxImage from './lightboxImage'
+import lazyframe from 'lazyframe'
 export default {
   props: {
     imgs: Array,
@@ -145,10 +170,14 @@ export default {
   },
   mounted () {
     window.addEventListener('scroll', this.resizeEvent)
+    let elements = document.querySelectorAll('.lazyframe')
+    lazyframe(elements)
   },
   watch: {
     state: {
       handler (val, oldVal) {
+        console.log('val', val)
+        console.log('oldVal', oldVal)
       },
       deep: true
     },
@@ -186,7 +215,9 @@ export default {
     },
     close () {
       store.close()
-      this.$emit('outClose')
+      console.log('this', this)
+      // this.$emit('outClose')
+      this.state.index = false
     },
     next () {
       store.next()
@@ -197,20 +228,7 @@ export default {
       this.setThundmail()
     },
     showCurrent (index) {
-      console.log('index', index)
       store.showCurrent(index)
-    },
-    enlarge () {
-      store.enlarge()
-      window.onresize()
-    },
-    narrow () {
-      store.narrow()
-      window.onresize()
-    },
-    rotate () {
-      store.rotate()
-      window.onresize()
     },
     setThundmail () {
       console.log('this.state.index', this.state.index)

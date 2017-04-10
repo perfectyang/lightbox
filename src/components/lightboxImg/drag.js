@@ -19,7 +19,7 @@ module.exports = {
       e.preventDefault()
       e.stopPropagation()
     }
-    document.onmouseup = () => {
+    document.onmouseup = (e) => {
       params.flag = false
       if (this.getCss(target, 'left') !== 'auto') {
         params.left = this.getCss(target, 'left')
@@ -28,6 +28,8 @@ module.exports = {
         params.top = this.getCss(target, 'top')
       }
       target.style.cursor = 'default'
+      e.preventDefault()
+      e.stopPropagation()
     }
     document.onmousemove = (event) => {
       var e = event || window.event

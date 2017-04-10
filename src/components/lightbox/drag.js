@@ -17,9 +17,10 @@ module.exports = {
           return false
         }
       }
-      const e = event
+      const e = event || window.event
       params.currentX = e.clientX
       params.currentY = e.clientY
+      console.log('params.currentX', params.currentX)
       target.style.cursor = 'pointer'
       e.preventDefault()
       e.stopPropagation()
@@ -47,6 +48,7 @@ module.exports = {
         target.style.left = parseInt(params.left) + disX + 'px'
         target.style.top = parseInt(params.top) + disY + 'px'
         target.style.cursor = 'pointer'
+        console.log('target.style.left', target.style.left)
       }
       e.preventDefault()
       e.stopPropagation()

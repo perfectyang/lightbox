@@ -41,7 +41,6 @@
     border: 1px solid #ccc;
   }
   .area-position {
-    position: relative;
     width: 100%;
     height: 100%;
     display: flex;
